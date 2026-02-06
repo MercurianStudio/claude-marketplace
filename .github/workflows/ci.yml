@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          echo "Validating JSON files..."
+          find . -name "*.json" -type f | while read file; do
+            echo "Checking $file"
+            python3 -m json.tool "$file" > /dev/null || exit 1
+          done
+          echo "All JSON files are valid"
+
+      - name: Validate marketplace structure
+        run: |
+          echo "Validating marketplace.json structure..."
+          python3 << 'EOF'
+          import json
+          import sys
+
+          with open('.claude-plugin/marketplace.json') as f:
+              marketplace = json.load(f)
+
+          errors = []
+
+          # Required top-level fields
+          if 'name' not in marketplace:
+              errors.append("Missing required field: name")
+          if 'owner' not in marketplace:
+              errors.append("Missing required field: owner")
+          elif 'name' not in marketplace.get('owner', {}):
+              errors.append("Missing required field: owner.name")
+          if 'plugins' not in marketplace:
+              errors.append("Missing required field: plugins")
+
+          # Validate each plugin
+          for i, plugin in enumerate(marketplace.get('plugins', [])):
+              if 'name' not in plugin:
+                  errors.append(f"Plugin {i}: missing required field 'name'")
+              if 'source' not in plugin:
+                  errors.append(f"Plugin {i}: missing required field 'source'")
+
+          if errors:
+              print("Validation errors:")
+              for e in errors:
+                  print(f"  - {e}")
+              sys.exit(1)
+
+          print("Marketplace structure is valid")
+          print(f"  Name: {marketplace['name']}")
+          print(f"  Owner: {marketplace['owner']['name']}")
+          print(f"  Plugins: {len(marketplace.get('plugins', []))}")
+          EOF
+
+      - name: Validate plugin manifests
+        run: |
+          echo "Validating plugin manifests..."
+          find ./plugins -name "plugin.json" | while read file; do
+            echo "Checking $file"
+            python3 << EOF
+          import json
+          import sys
+
+          with open("$file") as f:
+              plugin = json.load(f)
+
+          errors = []
+          if 'name' not in plugin:
+              errors.append("Missing required field: name")
+          if 'version' not in plugin:
+              errors.append("Missing required field: version")
+
+          if errors:
+              print(f"Errors in $file:")
+              for e in errors:
+                  print(f"  - {e}")
+              sys.exit(1)
+
+          print(f"  Valid: {plugin.get('name')} v{plugin.get('version')}")
+          EOF
+          done

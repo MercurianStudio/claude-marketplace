@@ -1,0 +1,25 @@
+{
+  "name": "mercurianstudio-marketplace",
+  "owner": {
+    "name": "mercurianstudio",
+    "email": "ops@mercurianlabs.studio"
+  },
+  "plugins": [
+    {
+      "name": "non-technical-builder-guide",
+      "description": "A patient technical guide subagent for non-technical builders.",
+      "version": "0.1.0",
+      "tags": [
+        "agents",
+        "guides",
+        "onboarding"
+      ],
+      "license": "MIT",
+      "source": "./plugins/non-technical-builder-guide"
+    }
+  ],
+  "metadata": {
+    "description": "Local Claude Code plugin marketplace (Mercurian Studio).",
+    "version": "0.1.0"
+  }
+}
