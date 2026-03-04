@@ -9,6 +9,17 @@ Build with Claude contribution-ready marketplace for Claude Code.
 - Agent: `non-technical-builder-guide`
 - Category: `specialized-domains`
 
+## What This Agent Does
+
+`non-technical-builder-guide` is a practical support agent for people without a software engineering background.
+
+- Explains technical concepts (APIs, tokens, credentials, integrations) in plain language
+- Starts with research-first guidance before recommending custom code
+- Asks focused clarification questions before making changes
+- Defaults to safe, read-only investigation unless changes are explicitly confirmed
+- Emphasizes security, privacy, and least-privilege handling of secrets
+- Provides step-by-step execution guidance with clear milestones
+
 ## Install
 
 ```bash
