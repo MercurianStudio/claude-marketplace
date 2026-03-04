@@ -1,0 +1,11 @@
+{
+  "name": "claude-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mercurian Studio Claude Code marketplace with Build with Claude contribution-ready structure.",
+  "license": "MIT",
+  "scripts": {
+    "test": "npm run validate",
+    "validate": "node scripts/validate-buildwithclaude-readiness.js"
+  }
+}

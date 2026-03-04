@@ -1,40 +1,59 @@
-# Mercurian Studio Plugin Marketplace
+# Mercurian Studio Claude Marketplace
 
-A Claude Code plugin marketplace by Mercurian Studio.
+Build with Claude contribution-ready marketplace for Claude Code.
 
-## Installation
+## Included Contribution
 
-```
+- Type: Agent plugin
+- Plugin: `agents-specialized-domains`
+- Agent: `non-technical-builder-guide`
+- Category: `specialized-domains`
+
+## Install
+
+```bash
 /plugin marketplace add MercurianStudio/claude-marketplace
-/plugin install non-technical-builder-guide@mercurianstudio-marketplace
+/plugin install agents-specialized-domains@mercurianstudio-marketplace
 ```
 
-## Available Plugins
+## Build with Claude Alignment
 
-| Plugin | Description |
-|--------|-------------|
-| `non-technical-builder-guide` | A patient technical guide for non-technical builders |
+This repo now matches the core requirements from <https://buildwithclaude.com/contribute> and the public contribution guide:
 
-## Local Development
+- Plugin path convention: `plugins/agents-<category>/...`
+- Agent frontmatter includes `name`, `description`, and valid `category`
+- Agent opening line starts with `You are a...`
+- Marketplace manifest includes schema, owner metadata, plugin metadata, and source paths
+- Plugin manifest includes `author.url`, `repository`, `license`, and `keywords`
+- Validation command available via `npm test`
 
-```
-/plugin marketplace add ./claude-marketplace
-/plugin install non-technical-builder-guide@mercurianstudio-marketplace
+## Validate Before Submission
+
+```bash
+npm test
 ```
 
 ## Structure
 
-```
+```text
 .claude-plugin/
-  marketplace.json        # Marketplace manifest
-.github/
-  workflows/ci.yml        # JSON linting and validation
+  marketplace.json
 plugins/
-  non-technical-builder-guide/
+  agents-specialized-domains/
     .claude-plugin/
-      plugin.json         # Plugin manifest
-    agents/               # Agent definitions
+      plugin.json
+    agents/
+      non-technical-builder-guide.md
+scripts/
+  validate-buildwithclaude-readiness.js
 ```
+
+## Submission Checklist
+
+1. Fork and clone `davepoon/buildwithclaude`
+2. Copy plugin contents into `plugins/agents-specialized-domains/` (or open a PR adding your agent under the correct category plugin)
+3. Run `npm test` in the target repo
+4. Open PR with examples and testing notes
 
 ## License
 
