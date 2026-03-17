@@ -17,15 +17,6 @@ const VALID_AGENT_CATEGORIES = new Set([
   'sales-marketing'
 ]);
 
-const VALID_PLUGIN_CATEGORIES = new Set([
-  'agents',
-  'commands',
-  'hooks',
-  'skills',
-  'utilities',
-  'mcp-servers'
-]);
-
 const errors = [];
 const warnings = [];
 
@@ -107,7 +98,7 @@ function validateMarketplaceJson(marketplace, filePath) {
   ensure(isNonEmptyString(marketplace.version), `${filePath}: missing or invalid "version"`);
   ensure(typeof marketplace.owner === 'object' && marketplace.owner !== null, `${filePath}: missing "owner" object`);
   ensure(typeof marketplace.metadata === 'object' && marketplace.metadata !== null, `${filePath}: missing "metadata" object`);
-  ensure(Array.isArray(marketplace.plugins), `${filePath}: missing "plugins" array`);
+  ensure(Array.isArray(marketplace.agents), `${filePath}: missing "agents" array`);
 
   if (marketplace.owner) {
     ensure(isNonEmptyString(marketplace.owner.name), `${filePath}: missing "owner.name"`);
@@ -120,66 +111,25 @@ function validateMarketplaceJson(marketplace, filePath) {
     ensure(isNonEmptyString(marketplace.metadata.license), `${filePath}: missing "metadata.license"`);
   }
 
-  if (!Array.isArray(marketplace.plugins)) {
+  if (!Array.isArray(marketplace.agents)) {
     return;
   }
 
-  for (const [index, plugin] of marketplace.plugins.entries()) {
-    const base = `${filePath}: plugins[${index}]`;
-    ensure(isNonEmptyString(plugin.name), `${base}: missing "name"`);
-    ensure(isNonEmptyString(plugin.version), `${base}: missing "version"`);
-    ensure(isNonEmptyString(plugin.description), `${base}: missing "description"`);
-    ensure(isNonEmptyString(plugin.source), `${base}: missing "source"`);
+  for (const [index, agent] of marketplace.agents.entries()) {
+    const base = `${filePath}: agents[${index}]`;
+    ensure(isNonEmptyString(agent.name), `${base}: missing "name"`);
+    ensure(isNonEmptyString(agent.version), `${base}: missing "version"`);
+    ensure(isNonEmptyString(agent.description), `${base}: missing "description"`);
+    ensure(isNonEmptyString(agent.source), `${base}: missing "source"`);
 
-    if (plugin.category && !VALID_PLUGIN_CATEGORIES.has(plugin.category)) {
-      warnings.push(`${base}: category "${plugin.category}" is uncommon; expected one of ${Array.from(VALID_PLUGIN_CATEGORIES).join(', ')}`);
+    if (agent.category && !VALID_AGENT_CATEGORIES.has(agent.category)) {
+      warnings.push(`${base}: category "${agent.category}" is uncommon; expected one of ${Array.from(VALID_AGENT_CATEGORIES).join(', ')}`);
     }
 
-    if (isNonEmptyString(plugin.source)) {
-      const sourcePath = path.resolve(plugin.source);
-      ensure(fileExists(sourcePath), `${base}: source path does not exist (${plugin.source})`);
+    if (isNonEmptyString(agent.source)) {
+      const sourcePath = path.resolve(agent.source);
+      ensure(fileExists(sourcePath), `${base}: source path does not exist (${agent.source})`);
     }
-  }
-}
-
-function validatePluginManifest(pluginDir) {
-  const pluginJsonPath = path.join(pluginDir, '.claude-plugin', 'plugin.json');
-  const plugin = readJsonFile(pluginJsonPath, pluginJsonPath);
-
-  if (!plugin) {
-    return;
-  }
-
-  const expectedName = path.basename(pluginDir);
-
-  ensure(isNonEmptyString(plugin.name), `${pluginJsonPath}: missing "name"`);
-  ensure(plugin.name === expectedName, `${pluginJsonPath}: "name" must match directory name (${expectedName})`);
-  ensure(isNonEmptyString(plugin.version), `${pluginJsonPath}: missing "version"`);
-  ensure(isNonEmptyString(plugin.description), `${pluginJsonPath}: missing "description"`);
-  ensure(typeof plugin.author === 'object' && plugin.author !== null, `${pluginJsonPath}: missing "author" object`);
-  ensure(isNonEmptyString(plugin.repository), `${pluginJsonPath}: missing "repository"`);
-  ensure(isNonEmptyString(plugin.license), `${pluginJsonPath}: missing "license"`);
-  ensure(Array.isArray(plugin.keywords), `${pluginJsonPath}: missing "keywords" array`);
-
-  if (plugin.author) {
-    ensure(isNonEmptyString(plugin.author.name), `${pluginJsonPath}: missing "author.name"`);
-    ensure(isNonEmptyString(plugin.author.url), `${pluginJsonPath}: missing "author.url"`);
-  }
-
-  const agentsDir = path.join(pluginDir, 'agents');
-  if (!fileExists(agentsDir)) {
-    warnings.push(`${pluginDir}: no agents directory present (valid if this plugin only contains other component types)`);
-    return;
-  }
-
-  const agentFiles = fs.readdirSync(agentsDir)
-    .filter((entry) => entry.endsWith('.md'))
-    .map((entry) => path.join(agentsDir, entry));
-
-  ensure(agentFiles.length > 0, `${pluginDir}: agents directory is empty`);
-
-  for (const agentFile of agentFiles) {
-    validateAgentFile(agentFile);
   }
 }
 
@@ -218,37 +168,34 @@ function validateAgentFile(agentFilePath) {
 }
 
 function main() {
-  const marketplacePath = path.join('.claude-plugin', 'marketplace.json');
-  const rootMarketplacePath = 'marketplace.json';
+  const marketplacePath = 'marketplace.json';
+  const marketplace = readJsonFile(marketplacePath, marketplacePath);
+  validateMarketplaceJson(marketplace, marketplacePath);
 
-  const claudeMarketplace = readJsonFile(marketplacePath, marketplacePath);
-  const rootMarketplace = readJsonFile(rootMarketplacePath, rootMarketplacePath);
+  const agentsDir = 'agents';
+  ensure(fileExists(agentsDir), 'Missing agents directory');
 
-  validateMarketplaceJson(claudeMarketplace, marketplacePath);
-  validateMarketplaceJson(rootMarketplace, rootMarketplacePath);
+  if (fileExists(agentsDir)) {
+    const agentFiles = fs.readdirSync(agentsDir)
+      .filter((entry) => entry.endsWith('.md'))
+      .map((entry) => path.join(agentsDir, entry));
 
-  if (claudeMarketplace && rootMarketplace) {
-    const a = JSON.stringify(claudeMarketplace);
-    const b = JSON.stringify(rootMarketplace);
-    if (a !== b) {
-      warnings.push('marketplace.json and .claude-plugin/marketplace.json differ; keep them synchronized');
-    }
-  }
+    ensure(agentFiles.length > 0, 'No agent files found in agents/');
 
-  const pluginsDir = 'plugins';
-  ensure(fileExists(pluginsDir), 'Missing plugins directory');
-
-  if (fileExists(pluginsDir)) {
-    const pluginDirs = fs.readdirSync(pluginsDir)
-      .map((entry) => path.join(pluginsDir, entry))
-      .filter((entry) => fs.statSync(entry).isDirectory());
-
-    if (pluginDirs.length === 0) {
-      errors.push('No plugin directories found in plugins/');
+    for (const agentFile of agentFiles) {
+      validateAgentFile(agentFile);
     }
 
-    for (const pluginDir of pluginDirs) {
-      validatePluginManifest(pluginDir);
+    // Verify marketplace agents match files on disk
+    if (marketplace && Array.isArray(marketplace.agents)) {
+      const agentFileNames = new Set(
+        agentFiles.map((f) => path.basename(f, '.md'))
+      );
+      for (const agent of marketplace.agents) {
+        if (isNonEmptyString(agent.name) && !agentFileNames.has(agent.name)) {
+          errors.push(`marketplace.json lists agent "${agent.name}" but no matching file exists in agents/`);
+        }
+      }
     }
   }
 
@@ -268,7 +215,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log('Build with Claude readiness validation passed.');
+  console.log('Subagent validation passed.');
 
   if (warnings.length > 0) {
     console.log('\nWarnings:');

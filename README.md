@@ -1,13 +1,10 @@
 # Mercurian Studio Claude Marketplace
 
-Build with Claude contribution-ready marketplace for Claude Code.
+Subagent marketplace for Claude Code.
 
-## Included Contribution
+## Included Subagent
 
-- Type: Agent plugin
-- Plugin: `agents-specialized-domains`
-- Agent: `non-technical-builder-guide`
-- Category: `specialized-domains`
+- **non-technical-builder-guide** — Patient technical guide for non-technical users building apps, integrating products, and navigating technical concepts.
 
 ## What This Agent Does
 
@@ -22,23 +19,15 @@ Build with Claude contribution-ready marketplace for Claude Code.
 
 ## Install
 
+Copy the agent file into your Claude Code agents directory:
+
 ```bash
-/plugin marketplace add MercurianStudio/claude-marketplace
-/plugin install agents-specialized-domains@mercurianstudio-marketplace
+cp agents/non-technical-builder-guide.md ~/.claude/agents/non-technical-builder-guide.md
 ```
 
-## Build with Claude Alignment
+Then use it as a subagent via the Agent tool with `subagent_type: "non-technical-builder-guide"`.
 
-This repo now matches the core requirements from <https://buildwithclaude.com/contribute> and the public contribution guide:
-
-- Plugin path convention: `plugins/agents-<category>/...`
-- Agent frontmatter includes `name`, `description`, and valid `category`
-- Agent opening line starts with `You are a...`
-- Marketplace manifest includes schema, owner metadata, plugin metadata, and source paths
-- Plugin manifest includes `author.url`, `repository`, `license`, and `keywords`
-- Validation command available via `npm test`
-
-## Validate Before Submission
+## Validate
 
 ```bash
 npm test
@@ -47,24 +36,18 @@ npm test
 ## Structure
 
 ```text
-.claude-plugin/
-  marketplace.json
-plugins/
-  agents-specialized-domains/
-    .claude-plugin/
-      plugin.json
-    agents/
-      non-technical-builder-guide.md
+agents/
+  non-technical-builder-guide.md
+marketplace.json
 scripts/
   validate-buildwithclaude-readiness.js
 ```
 
-## Submission Checklist
+## Adding a New Subagent
 
-1. Fork and clone `davepoon/buildwithclaude`
-2. Copy plugin contents into `plugins/agents-specialized-domains/` (or open a PR adding your agent under the correct category plugin)
-3. Run `npm test` in the target repo
-4. Open PR with examples and testing notes
+1. Create a new `.md` file in `agents/` with frontmatter (`name`, `description`, `category`)
+2. Add an entry to `marketplace.json` under `agents`
+3. Run `npm test` to validate
 
 ## License
 

@@ -1,8 +1,8 @@
 {
   "name": "claude-marketplace",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Mercurian Studio Claude Code marketplace with Build with Claude contribution-ready structure.",
+  "description": "Mercurian Studio Claude Code subagent marketplace.",
   "license": "MIT",
   "scripts": {
     "test": "npm run validate",

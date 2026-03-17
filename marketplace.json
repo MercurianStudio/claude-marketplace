@@ -1,15 +1,14 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mercurianstudio-marketplace",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "owner": {
     "name": "Mercurian Studio",
     "email": "ops@mercurianlabs.studio",
     "url": "https://github.com/MercurianStudio/claude-marketplace"
   },
   "metadata": {
-    "description": "Mercurian Studio Claude Code marketplace with specialized agents for non-technical builders.",
-    "version": "1.0.0",
+    "description": "Mercurian Studio Claude Code subagents for non-technical builders.",
+    "version": "2.0.0",
     "homepage": "https://github.com/MercurianStudio/claude-marketplace",
     "repository": "https://github.com/MercurianStudio/claude-marketplace",
     "license": "MIT",
@@ -21,10 +20,10 @@
       "non-technical"
     ]
   },
-  "plugins": [
+  "agents": [
     {
-      "name": "agents-specialized-domains",
-      "description": "Specialized-domain agents for non-technical builders and product execution.",
+      "name": "non-technical-builder-guide",
+      "description": "Patient technical guide for non-technical users building apps, integrating products, and navigating technical concepts. Use PROACTIVELY when the user appears non-technical, asks basic technical questions, needs help understanding APIs, tokens, credentials, or is trying to build something without a software engineering background.",
       "version": "1.0.0",
       "author": {
         "name": "Mercurian Studio",
@@ -32,14 +31,13 @@
       },
       "repository": "https://github.com/MercurianStudio/claude-marketplace",
       "license": "MIT",
+      "category": "specialized-domains",
       "keywords": [
-        "agents",
-        "subagents",
+        "subagent",
         "specialized-domains",
         "non-technical-builder-guide"
       ],
-      "category": "agents",
-      "source": "./plugins/agents-specialized-domains"
+      "source": "./agents/non-technical-builder-guide.md"
     }
   ]
 }

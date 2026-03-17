@@ -4,13 +4,12 @@ Thanks for contributing to this marketplace.
 
 ## Scope
 
-This repository is structured to be compatible with Build with Claude contribution requirements for agent plugins.
+This repository contains subagent definitions for Claude Code.
 
 Primary paths:
 
-- `plugins/agents-specialized-domains/agents/*.md`
-- `plugins/agents-specialized-domains/.claude-plugin/plugin.json`
-- `.claude-plugin/marketplace.json`
+- `agents/*.md`
+- `marketplace.json`
 
 ## Requirements
 
@@ -32,20 +31,21 @@ npm test
 - Use a valid agent `category`.
 - Start agent body with `You are a...`.
 - Keep trigger descriptions clear and specific.
+- Add a matching entry in `marketplace.json` under `agents`.
 - Do not commit secrets, API keys, or credentials.
 
 ## Pull Requests
 
 1. Create a branch:
-   - `add-<component-name>` for new contributions
-   - `update-<component-name>` for updates
+   - `add-<agent-name>` for new agents
+   - `update-<agent-name>` for updates
 2. Make your changes.
 3. Run `npm test`.
 4. Open a PR with:
    - Summary of changes
-   - Type/category
+   - Agent category
    - Validation results
-   - Example prompts (if agent changes)
+   - Example prompts
 
 ## Questions
 
